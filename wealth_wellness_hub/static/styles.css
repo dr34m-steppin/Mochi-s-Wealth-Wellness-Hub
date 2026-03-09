@@ -40,32 +40,23 @@ body {
   gap: 1rem;
 }
 
-.kicker {
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
-  margin: 0 0 0.5rem;
-  font-size: 0.75rem;
-}
-
 h1 {
   margin: 0;
   font-family: "Fraunces", serif;
   font-size: clamp(1.8rem, 4.8vw, 3.2rem);
 }
 
+.small-tail {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.45em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+}
+
 .subtitle {
   max-width: 720px;
   color: var(--muted);
-}
-
-.badge {
-  background: linear-gradient(135deg, rgba(83,230,184,0.2), rgba(255,167,89,0.2));
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 999px;
-  padding: 0.55rem 0.95rem;
-  font-weight: 700;
-  white-space: nowrap;
 }
 
 .grid {
