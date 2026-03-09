@@ -1,4 +1,4 @@
-﻿# Mochi-s-Wealth-Wellness-Hub
+﻿# SWAN (Sleep. Well. At. Night)
 
 A full-stack hackathon prototype for Problem Statement 1: Wealth Wellness Hub.
 
