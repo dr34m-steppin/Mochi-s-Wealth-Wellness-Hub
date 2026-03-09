@@ -1,0 +1,70 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mochi Wealth Wellness Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="aurora"></div>
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <p class="kicker">Fintech Innovators Hackathon 2026</p>
+        <h1>Wealth Wellness Hub</h1>
+        <p class="subtitle">A secure wealth wallet that unifies all assets, measures financial wellness in real time, and recommends actionable next moves.</p>
+      </div>
+      <div class="badge">Problem Statement 1</div>
+    </section>
+
+    <section class="grid cards" id="metricCards"></section>
+
+    <section class="grid two">
+      <article class="panel">
+        <h2>Wealth Composition</h2>
+        <div id="allocationBars" class="bars"></div>
+      </article>
+      <article class="panel">
+        <h2>Health Trend (12M)</h2>
+        <svg id="trend" viewBox="0 0 500 220" aria-label="Health trend chart"></svg>
+      </article>
+    </section>
+
+    <section class="grid two">
+      <article class="panel">
+        <h2>Scenario Cockpit</h2>
+        <form id="scenarioForm" class="scenario-form">
+          <label>Equity Shock (%)
+            <input type="range" name="equity_shock_pct" min="-40" max="40" step="1" value="-8" />
+            <span class="val" data-for="equity_shock_pct">-8%</span>
+          </label>
+          <label>Crypto Shock (%)
+            <input type="range" name="crypto_shock_pct" min="-60" max="80" step="1" value="-18" />
+            <span class="val" data-for="crypto_shock_pct">-18%</span>
+          </label>
+          <label>Monthly Contribution (SGD)
+            <input type="range" name="monthly_contribution" min="0" max="5000" step="100" value="1200" />
+            <span class="val" data-for="monthly_contribution">1200</span>
+          </label>
+          <label>Emergency Buffer Target (months)
+            <input type="range" name="emergency_buffer_target_months" min="1" max="12" step="1" value="6" />
+            <span class="val" data-for="emergency_buffer_target_months">6</span>
+          </label>
+          <button type="submit">Run Scenario</button>
+        </form>
+        <p id="scenarioNote" class="note"></p>
+      </article>
+      <article class="panel">
+        <h2>Action Intelligence</h2>
+        <div id="recommendations" class="recs"></div>
+      </article>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+﻿:root {
+  --bg: #0e1b21;
+  --panel: rgba(13, 30, 36, 0.78);
+  --line: rgba(160, 216, 197, 0.22);
+  --text: #e7fff6;
+  --muted: #9dc7b9;
+  --accent: #53e6b8;
+  --accent-alt: #ffa759;
+  --danger: #ff6d6d;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Space Grotesk", sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at 20% 10%, #1b3f49 0, #0e1b21 45%), linear-gradient(120deg, #061117, #102731 70%);
+  min-height: 100vh;
+}
+
+.aurora {
+  position: fixed;
+  inset: 0;
+  background: conic-gradient(from 90deg at 70% 30%, rgba(83,230,184,0.12), rgba(255,167,89,0.09), rgba(64,132,255,0.08), rgba(83,230,184,0.12));
+  filter: blur(52px);
+  pointer-events: none;
+}
+
+.shell {
+  position: relative;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.kicker {
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+}
+
+h1 {
+  margin: 0;
+  font-family: "Fraunces", serif;
+  font-size: clamp(1.8rem, 4.8vw, 3.2rem);
+}
+
+.subtitle {
+  max-width: 720px;
+  color: var(--muted);
+}
+
+.badge {
+  background: linear-gradient(135deg, rgba(83,230,184,0.2), rgba(255,167,89,0.2));
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 999px;
+  padding: 0.55rem 0.95rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.cards {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.two {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.panel, .metric {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  backdrop-filter: blur(5px);
+}
+
+.metric {
+  padding: 1rem;
+}
+
+.metric .label {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.metric .value {
+  margin-top: 0.35rem;
+  font-size: 1.85rem;
+  font-weight: 700;
+}
+
+.metric .delta {
+  margin-top: 0.3rem;
+  color: var(--accent);
+  font-size: 0.82rem;
+}
+
+.panel {
+  padding: 1rem;
+}
+
+h2 {
+  margin: 0 0 0.85rem;
+  font-size: 1rem;
+  color: #c8f9e7;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 130px 1fr 54px;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.83rem;
+}
+
+.bar-track {
+  background: rgba(255,255,255,0.08);
+  border-radius: 999px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), #65c8ff);
+}
+
+#trend {
+  width: 100%;
+  height: 210px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 12px;
+}
+
+.scenario-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.scenario-form label {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.35rem 0.8rem;
+  font-size: 0.85rem;
+  color: #d4fff2;
+}
+
+.scenario-form input[type="range"] {
+  grid-column: 1 / -1;
+  accent-color: var(--accent);
+}
+
+.val {
+  color: var(--accent-alt);
+  font-weight: 700;
+}
+
+button {
+  margin-top: 0.4rem;
+  border: none;
+  border-radius: 10px;
+  padding: 0.72rem 1rem;
+  cursor: pointer;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), #9ef4d8);
+  color: #032419;
+}
+
+.note {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin-top: 0.7rem;
+}
+
+.recs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.rec {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 0.75rem;
+  background: rgba(0,0,0,0.14);
+}
+
+.rec h3 {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.rec .impact {
+  color: var(--accent);
+  font-size: 0.78rem;
+  margin: 0.2rem 0 0.35rem;
+}
+
+.rec p {
+  margin: 0;
+  color: #d8ece5;
+  font-size: 0.84rem;
+}
+
+@media (max-width: 700px) {
+  .hero { flex-direction: column; }
+  .bar-row { grid-template-columns: 100px 1fr 44px; }
+}
