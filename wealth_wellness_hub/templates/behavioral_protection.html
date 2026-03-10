@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SWAN Behavioral Protection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="aurora"></div>
+  <main class="shell">
+    <header class="topbar">
+      <div class="topbar-user">
+        <span class="topbar-label">signed in as</span>
+        <strong>{{ user_email }}</strong>
+      </div>
+      <div class="topbar-actions">
+        <nav class="topnav">
+          <a href="/" class="topnav-link">Dashboard</a>
+          <a href="/behavioral-protection" class="topnav-link is-active">Behavioral Protection</a>
+        </nav>
+        <form method="post" action="/logout">
+          <button type="submit" class="ghost-button">Log Out</button>
+        </form>
+      </div>
+    </header>
+
+    <section class="hero hero-tight">
+      <div class="hero-copy">
+        <p class="section-tag">advanced insight layer</p>
+        <h1>Behavioral Protection</h1>
+        <p class="subtitle">SWAN quantifies behavioral alpha leakage, predicts panic-selling risk, and gives advisers visibility before emotional selling becomes portfolio damage.</p>
+      </div>
+    </section>
+
+    <section class="behavioral-stack">
+      <article class="panel insight-hero">
+        <div class="insight-copy">
+          <p class="insight-label">Behavioral Alpha Leakage</p>
+          <div class="insight-values">
+            <div>
+              <span class="insight-number">{{ insight.behavioral_drag_pct }}%</span>
+              <p class="insight-caption">Estimated behavioral drag per year</p>
+            </div>
+            <div>
+              <span class="insight-number">SGD {{ "{:,.0f}".format(insight.value_lost_annual) }}</span>
+              <p class="insight-caption">Approximate value lost annually</p>
+            </div>
+          </div>
+          <p class="insight-text">This estimates the gap between actual reactive investor behavior and a disciplined hold-or-rebalance strategy.</p>
+        </div>
+      </article>
+
+      <section class="grid cards behavioral-cards">
+        <article class="metric feature-metric">
+          <div class="label"><span class="label-text">Behavioral Discipline</span></div>
+          <div class="value">{{ insight.discipline_score }}%</div>
+          <div class="delta">Measures whether investor actions remain systematic through volatility.</div>
+        </article>
+        <article class="metric feature-metric">
+          <div class="label"><span class="label-text">Panic-Selling Risk</span></div>
+          <div class="value">{{ insight.panic_sell_risk }}%</div>
+          <div class="delta">Forecasts the probability of emotionally driven liquidation in a stress window.</div>
+        </article>
+        <article class="metric feature-metric">
+          <div class="label"><span class="label-text">Intervention Readiness</span></div>
+          <div class="value">{{ insight.intervention_readiness }}%</div>
+          <div class="delta">Shows how effectively SWAN can intervene before damaging behavior occurs.</div>
+        </article>
+        <article class="metric feature-metric">
+          <div class="label"><span class="label-text">Adviser Visibility</span></div>
+          <div class="value">{{ insight.adviser_visibility }}%</div>
+          <div class="delta">Gives advisers a live lens into client emotional vulnerability and action timing.</div>
+        </article>
+      </section>
+
+      <section class="grid two">
+        <article class="panel">
+          <h2>Protection Workflow</h2>
+          <div class="step-list">
+            {% for step in insight.protection_steps %}
+            <div class="step-item">
+              <span class="step-dot"></span>
+              <p>{{ step }}</p>
+            </div>
+            {% endfor %}
+          </div>
+        </article>
+        <article class="panel">
+          <h2>Adviser Watchlist</h2>
+          <div class="watchlist">
+            {% for item in insight.watchlist_flags %}
+            <div class="watch-item">
+              <div class="watch-head">
+                <strong>{{ item.title }}</strong>
+                <span class="watch-status">{{ item.status }}</span>
+              </div>
+              <p>{{ item.detail }}</p>
+            </div>
+            {% endfor %}
+          </div>
+        </article>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

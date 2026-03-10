@@ -12,6 +12,21 @@
 <body>
   <div class="aurora"></div>
   <main class="shell">
+    <header class="topbar">
+      <div class="topbar-user">
+        <span class="topbar-label">signed in as</span>
+        <strong>{{ user_email }}</strong>
+      </div>
+      <div class="topbar-actions">
+        <nav class="topnav">
+          <a href="/" class="topnav-link is-active">Dashboard</a>
+          <a href="/behavioral-protection" class="topnav-link">Behavioral Protection</a>
+        </nav>
+        <form method="post" action="/logout">
+          <button type="submit" class="ghost-button">Log Out</button>
+        </form>
+      </div>
+    </header>
     <section class="hero">
       <div class="hero-copy">
         <h1>SWAN</h1>

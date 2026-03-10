@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ page_title }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="aurora"></div>
+  <main class="shell auth-shell">
+    <section class="auth-layout">
+      <article class="auth-copy">
+        <p class="auth-kicker">private access</p>
+        <h1>SWAN</h1>
+        <p class="hero-system">behavioral wealth protection system</p>
+        <p class="subtitle">A calmer control center for portfolio visibility, behavioral discipline, and financial resilience.</p>
+      </article>
+      <article class="auth-card">
+        <div class="auth-tabs">
+          <a href="/login" class="auth-tab {% if mode == 'login' %}is-active{% endif %}">Log In</a>
+          <a href="/signup" class="auth-tab {% if mode == 'signup' %}is-active{% endif %}">Sign Up</a>
+        </div>
+        <h2>{{ card_title }}</h2>
+        <p class="auth-note">{{ card_note }}</p>
+        {% if error %}
+        <div class="auth-alert">{{ error }}</div>
+        {% endif %}
+        <form method="post" action="{{ form_action }}" class="auth-form">
+          <label>Email
+            <input type="email" name="email" placeholder="name@example.com" required />
+          </label>
+          <label>Password
+            <input type="password" name="password" placeholder="Minimum 8 characters" minlength="8" required />
+          </label>
+          {% if mode == 'signup' %}
+          <label>Confirm Password
+            <input type="password" name="confirm_password" placeholder="Repeat password" minlength="8" required />
+          </label>
+          {% endif %}
+          <button type="submit">{{ submit_label }}</button>
+        </form>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
