@@ -37,6 +37,14 @@
     </section>
 
     <section class="behavioral-stack">
+      <article class="panel client-score-panel">
+        <div>
+          <p class="insight-label">Dynamic Client Score</p>
+          <h2 class="client-score-title">{{ insight.client_score.summary }}</h2>
+          <p class="insight-text compact">SWAN continuously updates this score from contribution consistency, panic-selling history, rebalancing discipline, and live market stress cues.</p>
+        </div>
+      </article>
+
       <article class="panel insight-hero">
         <div class="insight-copy">
           <p class="insight-label">Behavioral Alpha Leakage</p>
@@ -104,7 +112,53 @@
           </div>
         </article>
       </section>
+
+      <section class="grid two">
+        <article class="panel">
+          <h2>Volatility Intervention Protocol</h2>
+          <p class="note">Simulated trigger event: client attempts to sell SGD 500,000 of an S&amp;P500 ETF during a sharp drawdown.</p>
+          <form id="interventionForm" class="scenario-form">
+            <label>Asset
+              <input type="text" name="asset_name" value="S&P500 ETF" class="text-input" />
+            </label>
+            <label>Trade Size (SGD)
+              <input type="text" name="trade_amount" value="500000" class="text-input" />
+            </label>
+            <label>Current Unrealized Loss (%)
+              <input type="range" name="unrealized_loss_pct" min="0" max="40" step="1" value="15" />
+              <span class="val" data-for="unrealized_loss_pct">15%</span>
+            </label>
+            <button type="submit">Attempt Trade</button>
+          </form>
+          <div id="interventionChecks" class="checks"></div>
+        </article>
+
+        <article class="panel">
+          <h2>Scenario Simulator</h2>
+          <form id="stressForm" class="scenario-form">
+            <label>Interest Rate Environment (+%)
+              <input type="range" name="rate_hike_pct" min="0" max="4" step="0.5" value="3" />
+              <span class="val" data-for="rate_hike_pct">3.0%</span>
+            </label>
+            <label>Market Crash (%)
+              <input type="range" name="market_crash_pct" min="-40" max="0" step="1" value="-20" />
+              <span class="val" data-for="market_crash_pct">-20%</span>
+            </label>
+            <label>Income Loss (months)
+              <input type="number" name="income_loss_months" min="0" max="24" value="6" class="text-input" />
+            </label>
+            <button type="submit">Run Stress Test</button>
+          </form>
+          <div id="stressOutput" class="stress-output"></div>
+        </article>
+      </section>
     </section>
   </main>
+  <div id="interventionModal" class="modal-shell is-hidden" aria-hidden="true">
+    <div class="modal-card">
+      <div id="modalContent"></div>
+    </div>
+  </div>
+  <script src="/static/behavioral.js"></script>
 </body>
 </html>

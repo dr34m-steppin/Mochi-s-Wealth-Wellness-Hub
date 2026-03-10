@@ -452,6 +452,27 @@ button {
   line-height: 1.6;
 }
 
+.insight-text.compact {
+  margin-top: 0.6rem;
+}
+
+.client-score-panel {
+  display: flex;
+  align-items: center;
+  min-height: 160px;
+  background:
+    radial-gradient(circle at right center, rgba(101, 200, 255, 0.14), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02)),
+    var(--panel);
+}
+
+.client-score-title {
+  margin: 0;
+  font-family: "Fraunces", serif;
+  font-size: clamp(1.6rem, 3vw, 2.35rem);
+  line-height: 1.15;
+}
+
 .behavioral-cards {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -514,6 +535,85 @@ button {
   margin: 0;
   color: #d8ece5;
   line-height: 1.5;
+}
+
+.checks,
+.stress-output {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.text-input {
+  width: 100%;
+  border: 1px solid rgba(157, 199, 185, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: #f2fff9;
+  border-radius: 12px;
+  padding: 0.85rem 0.95rem;
+  font: inherit;
+}
+
+.text-input:focus {
+  outline: 2px solid rgba(83, 230, 184, 0.25);
+  border-color: rgba(83, 230, 184, 0.55);
+}
+
+.modal-shell {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(1, 8, 11, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+}
+
+.modal-shell.is-hidden {
+  display: none;
+}
+
+.modal-card {
+  width: min(560px, 100%);
+  border-radius: 20px;
+  border: 1px solid rgba(157, 199, 185, 0.2);
+  background: rgba(6, 17, 23, 0.96);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+  padding: 1.35rem;
+}
+
+.modal-tag {
+  margin: 0 0 0.65rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.74rem;
+}
+
+.modal-card h3 {
+  margin: 0 0 0.65rem;
+  font-size: 1.2rem;
+}
+
+.modal-card p {
+  margin: 0;
+  color: #d8ece5;
+  line-height: 1.6;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.countdown {
+  margin-top: 1rem;
+  font-family: "Fraunces", serif;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  color: #ecfff9;
 }
 
 .auth-shell {
@@ -657,5 +757,8 @@ button {
   }
   .behavioral-cards {
     grid-template-columns: 1fr;
+  }
+  .modal-actions {
+    flex-direction: column;
   }
 }

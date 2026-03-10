@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 from copy import deepcopy
+from datetime import datetime
 from statistics import mean
 from typing import Dict, List
 
@@ -33,6 +34,10 @@ HEALTH_TIMELINE = [
     {"month": "Feb", "score": 77},
     {"month": "Mar", "score": 79},
 ]
+
+MORTGAGE_BALANCE = 780000.0
+BASE_MORTGAGE_PAYMENT = 4200.0
+MONTHLY_EXPENSE_BASE = 7200.0
 
 
 def _total_value(holdings: List[Dict]) -> float:
@@ -88,6 +93,29 @@ def _risk_heat(holdings: List[Dict]) -> float:
 
 def _wellness_score(div_score: float, liq_score: float, beh_score: float) -> float:
     return round(div_score * 0.4 + liq_score * 0.35 + beh_score * 0.25, 2)
+
+
+def _liquid_net_worth(holdings: List[Dict]) -> float:
+    return sum(h["value"] for h in holdings if h["liquidity_days"] <= 7)
+
+
+def _behavioral_client_score() -> Dict:
+    base_score = _behavioral_resilience_score()
+    minute = datetime.utcnow().minute
+    fluctuation = ((minute % 7) - 3) * 1.9
+    current_score = int(max(35, min(92, round(base_score - 13 + fluctuation))))
+    risk_band = (
+        "High Risk of Emotional Trading"
+        if current_score < 70
+        else "Moderate Risk of Emotional Trading"
+        if current_score < 82
+        else "Disciplined Under Stress"
+    )
+    return {
+        "score": current_score,
+        "risk_label": risk_band,
+        "summary": f"Current Client Score: {current_score}/100 - {risk_band}",
+    }
 
 
 def _recommendations(overview: Dict, allocation: List[Dict], emergency_target: int) -> List[Dict]:
@@ -165,6 +193,121 @@ def build_dashboard_snapshot(holdings: List[Dict] | None = None, emergency_targe
         "timeline": HEALTH_TIMELINE,
         "holdings": base,
         "recommendations": _recommendations(overview, allocation, emergency_target),
+    }
+
+
+def build_behavioral_snapshot() -> Dict:
+    client_score = _behavioral_client_score()
+    return {
+        "behavioral_drag_pct": 1.4,
+        "value_lost_annual": 4600,
+        "panic_sell_risk": 64,
+        "discipline_score": 78,
+        "intervention_readiness": 91,
+        "adviser_visibility": 88,
+        "client_score": client_score,
+        "watchlist_flags": [
+            {
+                "title": "Drawdown Sensitivity",
+                "status": "Elevated",
+                "detail": "Client behavior suggests a higher chance of reactive selling after a sharp 10-15% portfolio drawdown.",
+            },
+            {
+                "title": "Nudge Readiness",
+                "status": "High",
+                "detail": "The account is suitable for pre-commitment nudges, auto-rebalance prompts, and cooling-off alerts.",
+            },
+            {
+                "title": "Adviser Actionability",
+                "status": "Live",
+                "detail": "Advisers can see rising emotional risk before an instruction to liquidate is placed.",
+            },
+        ],
+        "protection_steps": [
+            "Measure contribution consistency, panic-sell history, and rebalance discipline.",
+            "Predict emotional selling risk from stress patterns and concentration pressure.",
+            "Trigger pre-loss nudges before reactive sell behavior appears.",
+            "Surface adviser alerts when a client enters a high-emotion window.",
+        ],
+    }
+
+
+def evaluate_trade_intervention(asset_name: str, trade_amount: float, unrealized_loss_pct: float) -> Dict:
+    liquid_net_worth = _liquid_net_worth(DEFAULT_HOLDINGS)
+    client_score = _behavioral_client_score()
+    exceeds_size_limit = trade_amount > liquid_net_worth * 0.05
+    low_behavioral_score = client_score["score"] < 70
+    trigger = exceeds_size_limit and low_behavioral_score
+
+    return {
+        "triggered": trigger,
+        "checks": {
+            "trade_size_pct_liquid_net_worth": round((trade_amount / liquid_net_worth) * 100, 2) if liquid_net_worth else 0,
+            "exceeds_size_limit": exceeds_size_limit,
+            "behavioral_score": client_score["score"],
+            "below_behavioral_threshold": low_behavioral_score,
+        },
+        "stage_one": {
+            "message": (
+                f"Market Volatility Alert. You are about to liquidate at a {unrealized_loss_pct:.0f}% loss. "
+                "Historically, portfolios structured like yours recover within 14 months. "
+                "Are you sure you want to lock in this loss?"
+            ),
+            "buttons": ["Cancel Trade", "Proceed Anyway"],
+        },
+        "stage_two": {
+            "message": (
+                "Per your Wealth Protection Agreement, high-volume trades during severe market drawdowns "
+                "require a 24-hour cooldown period."
+            ),
+            "countdown_seconds": 24 * 60 * 60,
+            "cancel_available": True,
+        },
+        "stage_three": {
+            "adviser_alert": (
+                f"Client X attempted to panic sell SGD {trade_amount:,.0f} of {asset_name}. "
+                "Trade is currently locked in a 24-hour cooldown. Recommended action: "
+                "Call client to discuss intergenerational wealth continuity and long-term goals."
+            ),
+            "email_status": "queued-for-adviser-review",
+        },
+    }
+
+
+def run_stress_test(rate_hike_pct: float, market_crash_pct: float, income_loss_months: int) -> Dict:
+    liquid_cash = next(h["value"] for h in DEFAULT_HOLDINGS if h["class"] == "Cash")
+    mortgage_payment = BASE_MORTGAGE_PAYMENT + (rate_hike_pct * 420)
+    equity_value = sum(h["value"] for h in DEFAULT_HOLDINGS if h["class"] == "Public Equities")
+    post_crash_equity_value = equity_value * (1 + market_crash_pct / 100.0)
+    monthly_cash_burn = MONTHLY_EXPENSE_BASE + mortgage_payment
+    if income_loss_months > 0:
+        monthly_cash_burn += 900
+    buffer_months = liquid_cash / monthly_cash_burn if monthly_cash_burn else 0
+
+    return {
+        "inputs": {
+            "rate_hike_pct": rate_hike_pct,
+            "market_crash_pct": market_crash_pct,
+            "income_loss_months": income_loss_months,
+        },
+        "outputs": {
+            "mortgage_payment": round(mortgage_payment, 2),
+            "post_crash_equity_value": round(post_crash_equity_value, 2),
+            "monthly_cash_burn": round(monthly_cash_burn, 2),
+            "buffer_months": round(buffer_months, 1),
+            "message": (
+                f"Stress Test Result: At a +{rate_hike_pct:.1f}% rate hike and {income_loss_months} months "
+                f"without income, your liquid cash will be depleted in {buffer_months:.1f} months."
+            ),
+            "recommendation": (
+                "Reallocate 5% of your Equities into high-yield Cash Deposits to build a safer buffer."
+                if buffer_months < income_loss_months
+                else "Your current cash buffer is resilient, but a modest rebalance toward deposits would improve optionality."
+            ),
+        },
+        "liabilities": {
+            "mortgage_balance": MORTGAGE_BALANCE,
+        },
     }
 
 

@@ -7,8 +7,14 @@ from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
 from wealth_wellness_hub.db import get_connection, init_db
-from wealth_wellness_hub.engine import build_dashboard_snapshot, run_scenario
-from wealth_wellness_hub.models import ScenarioInput
+from wealth_wellness_hub.engine import (
+    build_behavioral_snapshot,
+    build_dashboard_snapshot,
+    evaluate_trade_intervention,
+    run_scenario,
+    run_stress_test,
+)
+from wealth_wellness_hub.models import ScenarioInput, StressTestInput, TradeInterventionInput
 from wealth_wellness_hub.security import hash_password, verify_password
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -26,40 +32,6 @@ def startup() -> None:
 
 def current_user_email(request: Request) -> str | None:
     return request.session.get("user_email")
-
-
-def behavioral_insight_snapshot() -> dict:
-    return {
-        "behavioral_drag_pct": 1.4,
-        "value_lost_annual": 4600,
-        "panic_sell_risk": 64,
-        "discipline_score": 78,
-        "intervention_readiness": 91,
-        "adviser_visibility": 88,
-        "watchlist_flags": [
-            {
-                "title": "Drawdown Sensitivity",
-                "status": "Elevated",
-                "detail": "Client behavior suggests a higher chance of reactive selling after a sharp 10-15% portfolio drawdown.",
-            },
-            {
-                "title": "Nudge Readiness",
-                "status": "High",
-                "detail": "The account is suitable for pre-commitment nudges, auto-rebalance prompts, and cooling-off alerts.",
-            },
-            {
-                "title": "Adviser Actionability",
-                "status": "Live",
-                "detail": "Advisers can see rising emotional risk before an instruction to liquidate is placed.",
-            },
-        ],
-        "protection_steps": [
-            "Measure contribution consistency, panic-sell history, and rebalance discipline.",
-            "Predict emotional selling risk from stress patterns and concentration pressure.",
-            "Trigger pre-loss nudges before reactive sell behavior appears.",
-            "Surface adviser alerts when a client enters a high-emotion window.",
-        ],
-    }
 
 
 def render_auth(request: Request, mode: str, error: str = ""):
@@ -96,7 +68,7 @@ def behavioral_protection_page(request: Request):
         {
             "request": request,
             "user_email": user_email,
-            "insight": behavioral_insight_snapshot(),
+            "insight": build_behavioral_snapshot(),
         },
     )
 
@@ -183,4 +155,26 @@ def scenario_data(request: Request, payload: ScenarioInput):
         crypto_shock_pct=payload.crypto_shock_pct,
         monthly_contribution=payload.monthly_contribution,
         emergency_target=payload.emergency_buffer_target_months,
+    )
+
+
+@app.post("/api/intervention")
+def intervention_data(request: Request, payload: TradeInterventionInput):
+    if not current_user_email(request):
+        return RedirectResponse("/login", status_code=303)
+    return evaluate_trade_intervention(
+        asset_name=payload.asset_name,
+        trade_amount=payload.trade_amount,
+        unrealized_loss_pct=payload.unrealized_loss_pct,
+    )
+
+
+@app.post("/api/stress-test")
+def stress_test_data(request: Request, payload: StressTestInput):
+    if not current_user_email(request):
+        return RedirectResponse("/login", status_code=303)
+    return run_stress_test(
+        rate_hike_pct=payload.rate_hike_pct,
+        market_crash_pct=payload.market_crash_pct,
+        income_loss_months=payload.income_loss_months,
     )
