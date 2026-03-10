@@ -15,6 +15,7 @@ from wealth_wellness_hub.engine import (
     evaluate_trade_intervention,
     run_scenario,
     run_stress_test,
+    scale_holdings_to_net_worth,
     serialize_holdings,
 )
 from wealth_wellness_hub.models import HoldingsInput, NetWorthInput, ScenarioInput, StressTestInput, TradeInterventionInput
@@ -189,17 +190,24 @@ def update_client_net_worth(request: Request, payload: NetWorthInput):
     if not user:
         return RedirectResponse("/login", status_code=303)
 
+    saved_holdings = deserialize_holdings(user["holdings_json"])
+    updated_holdings = scale_holdings_to_net_worth(saved_holdings, payload.total_net_worth) if saved_holdings else None
+
     conn = get_connection()
     try:
         conn.execute(
-            "UPDATE users SET total_net_worth = ? WHERE id = ?",
-            (payload.total_net_worth, user["id"]),
+            "UPDATE users SET total_net_worth = ?, holdings_json = ? WHERE id = ?",
+            (
+                payload.total_net_worth,
+                serialize_holdings(updated_holdings) if updated_holdings else user["holdings_json"],
+                user["id"],
+            ),
         )
         conn.commit()
     finally:
         conn.close()
 
-    return build_dashboard_snapshot_for_net_worth(payload.total_net_worth)
+    return build_dashboard_snapshot_for_client(updated_holdings, payload.total_net_worth)
 
 
 @app.post("/api/client-profile/holdings")

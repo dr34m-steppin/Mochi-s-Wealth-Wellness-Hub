@@ -272,6 +272,34 @@ h1 {
   font-size: 0.82rem;
 }
 
+.metric-editor {
+  margin-top: 0.8rem;
+}
+
+.metric-edit-button {
+  padding: 0.45rem 0.72rem;
+  font-size: 0.8rem;
+}
+
+.metric-edit-form {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.metric-edit-form.is-hidden,
+.metric-edit-button.is-hidden {
+  display: none;
+}
+
+.metric-input {
+  padding: 0.72rem 0.85rem;
+}
+
+.metric-edit-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
 .panel {
   padding: 1rem;
 }
@@ -830,6 +858,9 @@ button {
     grid-template-columns: 1fr;
     flex-direction: column;
     align-items: stretch;
+  }
+  .metric-edit-actions {
+    flex-direction: column;
   }
   .modal-actions {
     flex-direction: column;

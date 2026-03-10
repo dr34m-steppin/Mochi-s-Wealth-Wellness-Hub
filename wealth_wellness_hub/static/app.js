@@ -55,6 +55,19 @@ function renderMetricCard(label, value, delta) {
     </span>
   ` : "";
 
+  const editor = label === "Net Worth" ? `
+    <div class="metric-editor">
+      <button type="button" class="ghost-button metric-edit-button" id="editNetWorthButton">Edit</button>
+      <form id="netWorthForm" class="metric-edit-form is-hidden">
+        <input type="number" name="total_net_worth" min="1000" step="1000" value="${Math.round(latestDashboard?.overview?.total_net_worth || 0)}" class="text-input metric-input" />
+        <div class="metric-edit-actions">
+          <button type="submit">Save</button>
+          <button type="button" class="ghost-button" id="cancelNetWorthButton">Cancel</button>
+        </div>
+      </form>
+    </div>
+  ` : "";
+
   return `
     <article class="metric">
       <div class="label">
@@ -63,6 +76,7 @@ function renderMetricCard(label, value, delta) {
       </div>
       <div class="value">${value}</div>
       <div class="delta">${delta}</div>
+      ${editor}
     </article>
   `;
 }
@@ -185,6 +199,7 @@ async function loadDashboard() {
 function renderAll(data) {
   latestDashboard = data;
   renderMetrics(data.overview);
+  bindNetWorthEditor();
   renderAllocation(data.allocation);
   renderCompositionEditor(data.holdings);
   renderTrend(data.timeline);
@@ -240,5 +255,39 @@ if (editCompositionButton) {
     if (!compositionEditor.classList.contains("is-hidden")) {
       renderCompositionEditor(latestDashboard.holdings);
     }
+  });
+}
+
+function bindNetWorthEditor() {
+  const editButton = document.getElementById("editNetWorthButton");
+  const formNode = document.getElementById("netWorthForm");
+  const cancelButton = document.getElementById("cancelNetWorthButton");
+
+  if (!editButton || !formNode || !cancelButton) {
+    return;
+  }
+
+  editButton.addEventListener("click", () => {
+    formNode.classList.remove("is-hidden");
+    editButton.classList.add("is-hidden");
+  });
+
+  cancelButton.addEventListener("click", () => {
+    formNode.classList.add("is-hidden");
+    editButton.classList.remove("is-hidden");
+  });
+
+  formNode.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const payload = {
+      total_net_worth: Number(formNode.elements.total_net_worth.value),
+    };
+    const response = await fetch("/api/client-profile/net-worth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    renderAll(data);
   });
 }

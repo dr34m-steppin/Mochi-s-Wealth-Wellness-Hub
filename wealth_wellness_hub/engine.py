@@ -58,6 +58,10 @@ def _scale_holdings_to_net_worth(holdings: List[Dict], target_total: float | Non
     return scaled
 
 
+def scale_holdings_to_net_worth(holdings: List[Dict], target_total: float | None) -> List[Dict]:
+    return _scale_holdings_to_net_worth(holdings, target_total)
+
+
 def serialize_holdings(holdings: List[Dict]) -> str:
     return json.dumps(holdings)
 
