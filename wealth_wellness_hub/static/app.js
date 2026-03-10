@@ -5,8 +5,62 @@ const trendSvg = document.getElementById("trend");
 const form = document.getElementById("scenarioForm");
 const scenarioNote = document.getElementById("scenarioNote");
 
+const metricMeta = {
+  "Net Worth": {
+    definition: "The total value of all connected assets across cash, public markets, private holdings, and digital wallets.",
+    derived: "Calculated as the straight sum of every tracked holding in the unified wallet view.",
+  },
+  "Wellness Score": {
+    definition: "A blended signal for overall financial health, balancing structure, flexibility, and investor behavior.",
+    derived: "Weighted from diversification (40%), liquidity (35%), and behavioral resilience (25%).",
+  },
+  "Risk Heat": {
+    definition: "A quick volatility proxy showing how exposed the portfolio is to high-movement asset classes.",
+    derived: "Computed from the portfolio's weighted asset volatility, then scaled into an easy-to-read 0-100 heat score.",
+  },
+  Diversification: {
+    definition: "How evenly wealth is spread across asset classes instead of being concentrated in a few sleeves.",
+    derived: "Based on concentration across asset-class weights using a normalized concentration index.",
+  },
+  Liquidity: {
+    definition: "How easily the investor can meet near-term cash needs without forcing distressed sales.",
+    derived: "Combines the share of assets sellable within 7 days and the months of expenses covered by cash reserves.",
+  },
+  "Behavioral Resilience": {
+    definition: "A measure of how stable decision-making remains under market stress and over long-term saving cycles.",
+    derived: "Built from contribution consistency, panic-sell penalties, and a bonus for disciplined rebalancing activity.",
+  },
+};
+
 function money(v) {
   return new Intl.NumberFormat("en-SG", { style: "currency", currency: "SGD", maximumFractionDigits: 0 }).format(v);
+}
+
+function renderMetricCard(label, value, delta) {
+  const meta = metricMeta[label];
+  const tooltip = meta ? `
+    <span class="info-wrap">
+      <button type="button" class="info-dot" aria-label="Explain ${label}">i</button>
+      <span class="tooltip" role="tooltip">
+        <strong>${label}</strong>
+        ${meta.definition}
+        <br><br>
+        <strong>How it's derived</strong>
+        ${meta.derived}
+      </span>
+    </span>
+  ` : "";
+
+  return `
+    <article class="metric">
+      <div class="label">
+        <span class="label-text">${label}</span>
+        ${tooltip}
+      </div>
+      <div class="value">${value}</div>
+      <div class="delta">${delta}</div>
+    </article>
+  `;
 }
 
 function renderMetrics(overview) {
@@ -19,13 +73,7 @@ function renderMetrics(overview) {
     ["Behavioral Resilience", `${overview.metrics.behavioral_resilience}%`, "Discipline under stress"],
   ];
 
-  metricCards.innerHTML = items.map(([label, value, delta]) => `
-    <article class="metric">
-      <div class="label">${label}</div>
-      <div class="value">${value}</div>
-      <div class="delta">${delta}</div>
-    </article>
-  `).join("");
+  metricCards.innerHTML = items.map(([label, value, delta]) => renderMetricCard(label, value, delta)).join("");
 }
 
 function renderAllocation(allocation) {
