@@ -276,6 +276,19 @@ h1 {
   padding: 1rem;
 }
 
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.panel-button {
+  padding: 0.5rem 0.8rem;
+  font-size: 0.82rem;
+}
+
 h2 {
   margin: 0 0 0.85rem;
   font-size: 1rem;
@@ -286,6 +299,59 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
+}
+
+.composition-editor {
+  margin-bottom: 1rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.composition-editor.is-hidden {
+  display: none;
+}
+
+.composition-form {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.composition-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  gap: 0.9rem;
+  align-items: end;
+}
+
+.composition-name {
+  color: #e7fff6;
+  font-weight: 600;
+}
+
+.composition-class {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin-top: 0.2rem;
+}
+
+.composition-row label {
+  display: grid;
+  gap: 0.35rem;
+  color: #d4fff2;
+  font-size: 0.82rem;
+}
+
+.composition-input {
+  padding: 0.75rem 0.85rem;
+}
+
+.composition-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 0.4rem;
 }
 
 .bar-row {
@@ -757,6 +823,13 @@ button {
   }
   .behavioral-cards {
     grid-template-columns: 1fr;
+  }
+  .panel-head,
+  .composition-row,
+  .composition-actions {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: stretch;
   }
   .modal-actions {
     flex-direction: column;

@@ -9,12 +9,15 @@ from starlette.middleware.sessions import SessionMiddleware
 from wealth_wellness_hub.db import get_connection, init_db
 from wealth_wellness_hub.engine import (
     build_behavioral_snapshot,
-    build_dashboard_snapshot,
+    build_dashboard_snapshot_for_client,
+    build_dashboard_snapshot_for_net_worth,
+    deserialize_holdings,
     evaluate_trade_intervention,
     run_scenario,
     run_stress_test,
+    serialize_holdings,
 )
-from wealth_wellness_hub.models import ScenarioInput, StressTestInput, TradeInterventionInput
+from wealth_wellness_hub.models import HoldingsInput, NetWorthInput, ScenarioInput, StressTestInput, TradeInterventionInput
 from wealth_wellness_hub.security import hash_password, verify_password
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -32,6 +35,20 @@ def startup() -> None:
 
 def current_user_email(request: Request) -> str | None:
     return request.session.get("user_email")
+
+
+def current_user_row(request: Request):
+    user_email = current_user_email(request)
+    if not user_email:
+        return None
+    conn = get_connection()
+    try:
+        return conn.execute(
+            "SELECT id, email, total_net_worth, holdings_json FROM users WHERE email = ?",
+            (user_email,),
+        ).fetchone()
+    finally:
+        conn.close()
 
 
 def render_auth(request: Request, mode: str, error: str = ""):
@@ -141,20 +158,70 @@ def logout(request: Request):
 
 @app.get("/api/dashboard")
 def dashboard_data(request: Request):
-    if not current_user_email(request):
+    user = current_user_row(request)
+    if not user:
         return RedirectResponse("/login", status_code=303)
-    return build_dashboard_snapshot()
+    return build_dashboard_snapshot_for_client(
+        deserialize_holdings(user["holdings_json"]),
+        user["total_net_worth"],
+    )
 
 
 @app.post("/api/scenario")
 def scenario_data(request: Request, payload: ScenarioInput):
-    if not current_user_email(request):
+    user = current_user_row(request)
+    if not user:
         return RedirectResponse("/login", status_code=303)
+    saved_holdings = deserialize_holdings(user["holdings_json"])
+    total_net_worth = None if saved_holdings else user["total_net_worth"]
     return run_scenario(
         equity_shock_pct=payload.equity_shock_pct,
         crypto_shock_pct=payload.crypto_shock_pct,
         monthly_contribution=payload.monthly_contribution,
         emergency_target=payload.emergency_buffer_target_months,
+        total_net_worth=total_net_worth,
+    )
+
+
+@app.post("/api/client-profile/net-worth")
+def update_client_net_worth(request: Request, payload: NetWorthInput):
+    user = current_user_row(request)
+    if not user:
+        return RedirectResponse("/login", status_code=303)
+
+    conn = get_connection()
+    try:
+        conn.execute(
+            "UPDATE users SET total_net_worth = ? WHERE id = ?",
+            (payload.total_net_worth, user["id"]),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+    return build_dashboard_snapshot_for_net_worth(payload.total_net_worth)
+
+
+@app.post("/api/client-profile/holdings")
+def update_client_holdings(request: Request, payload: HoldingsInput):
+    user = current_user_row(request)
+    if not user:
+        return RedirectResponse("/login", status_code=303)
+
+    serialized = serialize_holdings([holding.model_dump(by_alias=True) for holding in payload.holdings])
+    conn = get_connection()
+    try:
+        conn.execute(
+            "UPDATE users SET holdings_json = ?, total_net_worth = ? WHERE id = ?",
+            (serialized, sum(holding.value for holding in payload.holdings), user["id"]),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+    return build_dashboard_snapshot_for_client(
+        deserialize_holdings(serialized),
+        None,
     )
 
 

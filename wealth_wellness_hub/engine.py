@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 from datetime import datetime
+import json
 from statistics import mean
 from typing import Dict, List
 
@@ -42,6 +43,52 @@ MONTHLY_EXPENSE_BASE = 7200.0
 
 def _total_value(holdings: List[Dict]) -> float:
     return sum(item["value"] for item in holdings)
+
+
+def _scale_holdings_to_net_worth(holdings: List[Dict], target_total: float | None) -> List[Dict]:
+    if target_total is None:
+        return deepcopy(holdings)
+    current_total = _total_value(holdings)
+    if current_total <= 0:
+        return deepcopy(holdings)
+    ratio = target_total / current_total
+    scaled = deepcopy(holdings)
+    for holding in scaled:
+        holding["value"] = round(holding["value"] * ratio, 2)
+    return scaled
+
+
+def serialize_holdings(holdings: List[Dict]) -> str:
+    return json.dumps(holdings)
+
+
+def normalize_holdings(holdings: List[Dict] | None) -> List[Dict]:
+    if not holdings:
+        return deepcopy(DEFAULT_HOLDINGS)
+    normalized: List[Dict] = []
+    for holding in holdings:
+        normalized.append(
+            {
+                "name": str(holding["name"]),
+                "class": str(holding["class"]),
+                "value": round(float(holding["value"]), 2),
+                "liquidity_days": int(holding["liquidity_days"]),
+                "volatility": float(holding["volatility"]),
+            }
+        )
+    return normalized
+
+
+def deserialize_holdings(holdings_json: str | None) -> List[Dict] | None:
+    if not holdings_json:
+        return None
+    try:
+        parsed = json.loads(holdings_json)
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(parsed, list):
+        return None
+    return normalize_holdings(parsed)
 
 
 def _allocation_by_class(holdings: List[Dict]) -> List[Dict]:
@@ -196,6 +243,17 @@ def build_dashboard_snapshot(holdings: List[Dict] | None = None, emergency_targe
     }
 
 
+def build_dashboard_snapshot_for_net_worth(total_net_worth: float | None, emergency_target: int = 6) -> Dict:
+    scaled_holdings = _scale_holdings_to_net_worth(DEFAULT_HOLDINGS, total_net_worth)
+    return build_dashboard_snapshot(scaled_holdings, emergency_target)
+
+
+def build_dashboard_snapshot_for_client(holdings: List[Dict] | None, total_net_worth: float | None, emergency_target: int = 6) -> Dict:
+    if holdings:
+        return build_dashboard_snapshot(normalize_holdings(holdings), emergency_target)
+    return build_dashboard_snapshot_for_net_worth(total_net_worth, emergency_target)
+
+
 def build_behavioral_snapshot() -> Dict:
     client_score = _behavioral_client_score()
     return {
@@ -311,8 +369,14 @@ def run_stress_test(rate_hike_pct: float, market_crash_pct: float, income_loss_m
     }
 
 
-def run_scenario(equity_shock_pct: float, crypto_shock_pct: float, monthly_contribution: float, emergency_target: int):
-    updated = deepcopy(DEFAULT_HOLDINGS)
+def run_scenario(
+    equity_shock_pct: float,
+    crypto_shock_pct: float,
+    monthly_contribution: float,
+    emergency_target: int,
+    total_net_worth: float | None = None,
+):
+    updated = _scale_holdings_to_net_worth(DEFAULT_HOLDINGS, total_net_worth)
 
     for h in updated:
         if h["class"] == "Public Equities":

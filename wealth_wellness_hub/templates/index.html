@@ -39,7 +39,11 @@
 
     <section class="grid two">
       <article class="panel">
-        <h2>Wealth Composition</h2>
+        <div class="panel-head">
+          <h2>Wealth Composition</h2>
+          <button type="button" id="editCompositionButton" class="ghost-button panel-button">Edit Holdings</button>
+        </div>
+        <div id="compositionEditor" class="composition-editor is-hidden"></div>
         <div id="allocationBars" class="bars"></div>
       </article>
       <article class="panel">

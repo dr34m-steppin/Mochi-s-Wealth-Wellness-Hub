@@ -18,3 +18,21 @@ class StressTestInput(BaseModel):
     rate_hike_pct: float = Field(default=3.0, ge=0, le=4)
     market_crash_pct: float = Field(default=-20.0, ge=-40, le=0)
     income_loss_months: int = Field(default=6, ge=0, le=24)
+
+
+class NetWorthInput(BaseModel):
+    total_net_worth: float = Field(default=274000.0, gt=1000, le=100000000)
+
+
+class HoldingInput(BaseModel):
+    name: str = Field(min_length=2, max_length=80)
+    class_name: str = Field(alias="class", min_length=2, max_length=80)
+    value: float = Field(ge=0, le=100000000)
+    liquidity_days: int = Field(ge=0, le=3650)
+    volatility: float = Field(ge=0, le=5)
+
+    model_config = {"populate_by_name": True}
+
+
+class HoldingsInput(BaseModel):
+    holdings: list[HoldingInput]

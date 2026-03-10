@@ -4,6 +4,10 @@ const recommendations = document.getElementById("recommendations");
 const trendSvg = document.getElementById("trend");
 const form = document.getElementById("scenarioForm");
 const scenarioNote = document.getElementById("scenarioNote");
+const compositionEditor = document.getElementById("compositionEditor");
+const editCompositionButton = document.getElementById("editCompositionButton");
+
+let latestDashboard = null;
 
 const metricMeta = {
   "Net Worth": {
@@ -86,6 +90,58 @@ function renderAllocation(allocation) {
   `).join("");
 }
 
+function renderCompositionEditor(holdings) {
+  if (!compositionEditor || !holdings) {
+    return;
+  }
+  compositionEditor.innerHTML = `
+    <form id="compositionForm" class="composition-form">
+      ${holdings.map((holding, index) => `
+        <div class="composition-row">
+          <div>
+            <div class="composition-name">${holding.name}</div>
+            <div class="composition-class">${holding.class}</div>
+          </div>
+          <label>
+            <span>Value (SGD)</span>
+            <input type="number" name="value-${index}" value="${Math.round(holding.value)}" min="0" step="100" class="text-input composition-input" />
+          </label>
+        </div>
+      `).join("")}
+      <div class="composition-actions">
+        <button type="submit">Save Holdings</button>
+        <button type="button" class="ghost-button" id="cancelCompositionButton">Cancel</button>
+      </div>
+    </form>
+  `;
+
+  const formNode = document.getElementById("compositionForm");
+  const cancelButton = document.getElementById("cancelCompositionButton");
+
+  cancelButton.addEventListener("click", () => {
+    compositionEditor.classList.add("is-hidden");
+  });
+
+  formNode.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const payload = {
+      holdings: holdings.map((holding, index) => ({
+        ...holding,
+        value: Number(formNode.elements[`value-${index}`].value),
+      })),
+    };
+
+    const response = await fetch("/api/client-profile/holdings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    compositionEditor.classList.add("is-hidden");
+    renderAll(data);
+  });
+}
+
 function renderTrend(timeline) {
   const width = 500;
   const height = 220;
@@ -127,8 +183,10 @@ async function loadDashboard() {
 }
 
 function renderAll(data) {
+  latestDashboard = data;
   renderMetrics(data.overview);
   renderAllocation(data.allocation);
+  renderCompositionEditor(data.holdings);
   renderTrend(data.timeline);
   renderRecs(data.recommendations);
   if (data.scenario?.note) {
@@ -172,3 +230,15 @@ form.addEventListener("submit", async (e) => {
 
 bindSliders();
 loadDashboard();
+
+if (editCompositionButton) {
+  editCompositionButton.addEventListener("click", () => {
+    if (!latestDashboard?.holdings) {
+      return;
+    }
+    compositionEditor.classList.toggle("is-hidden");
+    if (!compositionEditor.classList.contains("is-hidden")) {
+      renderCompositionEditor(latestDashboard.holdings);
+    }
+  });
+}
