@@ -16,7 +16,7 @@ A full-stack hackathon prototype for Problem Statement 1: Wealth Wellness Hub.
 
 ## Windows setup (VSCode)
 ```powershell
-cd "C:\Users\sethy\MyProjects\Mochi-s-Wealth-Wellness-Hub"
+cd 
 python -m venv .venv
 .\.venv\Scripts\activate
 pip install -r requirements.txt
